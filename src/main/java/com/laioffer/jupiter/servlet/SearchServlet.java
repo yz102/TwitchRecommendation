@@ -1,0 +1,40 @@
+package com.laioffer.jupiter.servlet;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.laioffer.jupiter.external.TwitchClient;
+import com.laioffer.jupiter.external.TwitchException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet(name = "SearchServlet", urlPatterns = {"/search"})
+public class SearchServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//front end: 获取参数， getParameter
+        String gameId = request.getParameter("game_id");
+        //如果没有id，就是错的
+        if (gameId == null) {
+            //status: 200/300/500
+            //the same as status: 400
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        TwitchClient client = new TwitchClient();
+        try {
+//            response.setContentType("application/json;charset=UTF-8");
+//            //Map<String, > map = client.searchItems(gameId)
+//            response.getWriter().print(new ObjectMapper().writeValueAsString(client.searchItems(gameId)));
+            ServletUtil.writeItemMap(response, client.searchItems(gameId));
+
+
+
+        } catch (TwitchException e) {
+            throw new ServletException(e);
+        }
+    }
+}
